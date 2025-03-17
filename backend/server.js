@@ -18,17 +18,29 @@ app.post('/api/payment/create-subscription', async (req, res) => {
     try {
         const plan_id = req.body.plan_id;
         if (!plan_id) return res.status(400).send({ error: "Plan ID required" });
-        const options = { plan_id: plan_id, customer_notify: 1 };
+        
+        const options = {
+            plan_id: plan_id,
+            customer_notify: 1,
+            total_count: 12  // Number of billing cycles
+        };
+
+        console.log('Creating subscription with options:', options);
+
         razorpayInstance.subscriptions.create(options, (err, subscription) => {
             if (err) {
-                console.error("Sub. Create Error:", err);
-                return res.status(500).send({ error: "Sub. Create Failed" });
+                console.error("Subscription Creation Error Details:", err);
+                return res.status(500).send({ 
+                    error: "Subscription Creation Failed",
+                    details: err.message 
+                });
             }
+            console.log('Subscription created successfully:', subscription);
             res.json(subscription);
         });
     } catch (error) {
         console.error("Server Error (createSub):", error);
-        res.status(500).send({ error: "Server Error" });
+        res.status(500).send({ error: "Server Error", details: error.message });
     }
 });
 
