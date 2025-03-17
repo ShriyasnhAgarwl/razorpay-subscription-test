@@ -13,8 +13,8 @@ function App() {
 
     // **Replace with your actual Razorpay Plan IDs (Test Mode)**
     const testPlanIds = [
-        "plan_MOCK_MONTHLY_PLAN_ID",  // Replace with your Test Monthly Plan ID
-        "plan_MOCK_YEARLY_PLAN_ID"   // Replace with your Test Yearly Plan ID
+        "plan_Q5sEa8mqeqH9fA",  // Replace with your Test Monthly Plan ID
+        "plan_Q5sDqOb6BLt5A8"   // Replace with your Test Yearly Plan ID
     ];
 
     const handleSubscriptionSuccess = (response) => {
@@ -40,15 +40,15 @@ function App() {
         }
         setErrorMsg('');
         try {
-            const response = await axios.post('/api/payment/create-subscription', { plan_id: selectedPlanId });
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/payment/create-subscription`, { plan_id: selectedPlanId });
             const subscription = response.data;
             return {
                 key: process.env.REACT_APP_RAZORPAY_KEY_ID,
                 subscription_id: subscription.id,
-                name: "Test Subscription App",
-                description: "Sample Subscription",
+                name: "Cloud tuner Subscription",
+                description: "Monthly Subscription",
                 handler: handleSubscriptionSuccess,
-                theme: { color: "#686CFD" }
+                theme: { color: "#2D64BF" }
             };
         } catch (error) {
             console.error("Error creating subscription:", error);
@@ -61,7 +61,8 @@ function App() {
         const options = await createRazorpaySubscription();
         if (!options) return;
 
-        const rzp = new Razorpay(options);
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', handleSubscriptionError);
         rzp.open();
     };
 
